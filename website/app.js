@@ -3,62 +3,137 @@
 // =====================================================================
 
 // ---------------------------------------------------------------------
-// CINEMATIC INTRO
+// CINEMATIC INTRO — ~60s scene-by-scene explainer with kinetic typography
 // ---------------------------------------------------------------------
 (function () {
   const intro = document.getElementById('intro');
-  const wordEl = intro ? intro.querySelector('.intro-word') : null;
-  const skip = document.getElementById('intro-skip');
+  if (!intro) return;
+  const stage  = document.getElementById('intro-stage');
+  const bar    = document.getElementById('intro-progress-bar');
+  const skip   = document.getElementById('intro-skip');
   const replay = document.getElementById('replay-intro');
-  if (!intro || !wordEl) return;
+  const flash  = intro.querySelector('.intro-flash');
+  const sweep  = intro.querySelector('.intro-sweep');
 
-  // build the wordmark char-by-char with staggered bloom
-  function buildWord() {
-    const word = wordEl.dataset.word || 'PhantomTalk';
-    wordEl.innerHTML = '';
-    [...word].forEach((c, i) => {
+  let timers = [];
+  let idx = 0;
+  let running = false;
+
+  const T = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
+  const clearAll = () => { timers.forEach(clearTimeout); timers = []; };
+
+  // Build a line whose letters drop in column-by-column (3D flip + blur).
+  function line(parent, text, cls, baseDelay) {
+    const el = document.createElement('div');
+    el.className = 'line ' + (cls || '');
+    parent.appendChild(el);
+    let li = 0;
+    [...text].forEach(ch => {
+      if (ch === ' ') { const sp = document.createElement('span'); sp.className = 'sp'; el.appendChild(sp); return; }
       const s = document.createElement('span');
-      s.className = 'ch';
-      // make "Talk" tail bolder/amber via <b> grouping not needed; color handled by gradient
-      s.textContent = c;
-      s.style.animationDelay = (0.6 + i * 0.06) + 's';
-      wordEl.appendChild(s);
+      s.className = 'l'; s.textContent = ch;
+      s.style.animationDelay = ((baseDelay || 0) + li * 0.045) + 's';
+      el.appendChild(s);
+      li++;
     });
+    return el;
   }
 
-  function end() {
-    if (intro.classList.contains('gone')) return;
+  // ----- the scene script (durations sum to ~60s) -----
+  const SCENES = [
+    { dur: 8000, build(s) {                       // 1 · cold open
+        line(s, 'PhantomTalk', 'xl glow', 0.3);
+        line(s, 'голос · который · слышно', 'sub', 1.3);
+    }},
+    { dur: 9000, build(s) {                       // 2 · the problem
+        line(s, 'Твой голос', 'lg', 0.0);
+        line(s, 'в Discord', 'lg', 0.5);
+        line(s, 'сжат до хрипа', 'lg dim', 1.0);
+        line(s, '64 кбит/с · моно', 'sub', 1.9);
+    }},
+    { dur: 8000, build(s) {                       // 3 · the turn
+        line(s, 'Хватит.', 'xl', 0.0);
+        line(s, 'Слушай по-настоящему', 'lg glow', 0.9);
+    }},
+    { dur: 11000, build(s) {                      // 4 · the number
+        const n = document.createElement('div'); n.className = 'big-num'; n.textContent = '0'; s.appendChild(n);
+        T(() => {
+          const t0 = performance.now(), d = 1500;
+          const step = now => { const t = Math.min(1, (now - t0) / d); n.textContent = Math.round(510 * (1 - Math.pow(1 - t, 3))); if (t < 1) requestAnimationFrame(step); };
+          requestAnimationFrame(step);
+        }, 350);
+        line(s, 'кбит/с · stereo', 'md glow', 1.5);
+        line(s, '× 5 к голосу Discord', 'sub', 2.2);
+    }},
+    { dur: 10000, build(s) {                      // 5 · what you get
+        line(s, 'Свои серверы', 'lg', 0.0);
+        line(s, 'Свои каналы', 'lg', 0.7);
+        line(s, 'Только твой звук', 'lg glow', 1.4);
+    }},
+    { dur: 7000, build(s) {                       // 6 · tech
+        const c = document.createElement('div'); c.className = 'chips'; s.appendChild(c);
+        ['Opus', 'UDP-relay', '0 пересжатий', 'self-hosted'].forEach((t, i) => {
+          const d = document.createElement('div'); d.className = 'ichip'; d.textContent = t;
+          d.style.animationDelay = (0.15 + i * 0.18) + 's'; c.appendChild(d);
+        });
+    }},
+    { dur: 7000, build(s) {                       // 7 · logo finale
+        line(s, 'PhantomTalk', 'xl glow', 0.2);
+        line(s, 'голос, который слышно', 'sub', 1.4);
+    }},
+  ];
+
+  const fire = (el) => { if (!el) return; el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); };
+
+  function runScene() {
+    if (idx >= SCENES.length) { finish(); return; }
+    const sc = SCENES[idx++];
+    stage.innerHTML = '';
+    const node = document.createElement('div'); node.className = 'scene';
+    stage.appendChild(node);
+    sc.build(node);
+    void node.offsetWidth;
+    fire(flash); fire(sweep);
+    T(() => node.classList.add('leaving'), sc.dur - 650);
+    T(runScene, sc.dur);
+  }
+
+  function startBar(total) {
+    if (!bar) return;
+    bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth;
+    bar.style.transition = 'width ' + total + 'ms linear'; bar.style.width = '100%';
+  }
+
+  function finish() {
+    if (!running && intro.classList.contains('gone')) return;
+    clearAll(); running = false;
     intro.classList.add('gone');
     document.body.classList.remove('intro-lock');
     setTimeout(() => { intro.style.display = 'none'; }, 1100);
   }
 
   function play() {
+    clearAll(); running = true; idx = 0;
+    sessionStorage.setItem('pt_intro_seen', '1');
     intro.style.display = 'flex';
     intro.classList.remove('gone');
+    intro.classList.add('lit');
     document.body.classList.add('intro-lock');
-    // restart ring/orb/flare animations by reflow
-    intro.querySelectorAll('.intro-rings span, .intro-orb, .intro-flare, .intro-tag, .intro-skip')
-      .forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
-    buildWord();
-    clearTimeout(play._t);
-    play._t = setTimeout(end, 4200);
+    const total = SCENES.reduce((a, b) => a + b.dur, 0);
+    startBar(total);
+    runScene();
   }
 
-  skip && skip.addEventListener('click', end);
-  intro.addEventListener('click', end);
-  window.addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === ' ') end(); }, { once: true });
+  skip && skip.addEventListener('click', finish);
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && running) finish(); });
   replay && replay.addEventListener('click', e => { e.preventDefault(); play(); });
 
-  // Play once per browser session; instantly dismiss on later loads.
   if (sessionStorage.getItem('pt_intro_seen')) {
     intro.style.display = 'none';
     intro.classList.add('gone');
     document.body.classList.remove('intro-lock');
   } else {
-    sessionStorage.setItem('pt_intro_seen', '1');
-    buildWord();
-    play._t = setTimeout(end, 4200);
+    play();
   }
 })();
 
