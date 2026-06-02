@@ -1,0 +1,28 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# build artifacts
+build/
+dist/
+*.spec
+
+# database
+server/phantomtalk.db
+*.db
+
+# pyinstaller noise
+*.log
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# do not ship the 50MB binary in git (release it instead)
+website/PhantomTalk.exe

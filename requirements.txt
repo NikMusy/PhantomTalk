@@ -1,0 +1,11 @@
+PyQt6
+sounddevice
+numpy
+opuslib
+fastapi
+uvicorn[standard]
+websockets
+aiosqlite
+passlib
+bcrypt
+pyinstaller

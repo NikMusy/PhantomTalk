@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "phantomtalk",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["server/server.py"],
+      "port": 9050
+    }
+  ]
+}
