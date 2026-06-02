@@ -145,6 +145,39 @@ body::before {
 }
 @keyframes punch { from { opacity:0; transform: scale(1.7); filter: blur(34px); } to { opacity:1; transform: scale(1); filter: blur(0); } }
 
+/* ---- Russian tricolor flyby flag ---- */
+.ru-flag {
+  position: absolute; left: 50%; top: 50%;
+  width: 56vw; max-width: 760px; height: 30vw; max-height: 420px;
+  transform: translate(-160%, -50%) rotate(-8deg) skewX(-6deg);
+  filter: drop-shadow(0 0 70px rgba(255,180,120,0.5)) drop-shadow(0 0 16px rgba(214,31,18,0.6))
+          blur(0.4px) saturate(1.05);
+  display: flex; flex-direction: column; border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,220,180,0.35);
+  opacity: 0; mix-blend-mode: screen;
+  animation: ruFlyby 5s cubic-bezier(.22,.85,.3,1) .3s forwards;
+  z-index: 0;   /* behind text */
+}
+.line { position: relative; z-index: 2; }
+.ru-flag i { display:block; flex:1 1 0; position:relative; }
+.ru-flag .b-white { background: #ffffff; }
+.ru-flag .b-blue  { background: #0039A6; }
+.ru-flag .b-red   { background: #D52B1E; }
+/* subtle wave shimmer */
+.ru-flag i::after {
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+  animation: ruShimmer 3.2s linear infinite;
+}
+@keyframes ruShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes ruFlyby {
+  0%   { transform: translate(-160%, -50%) rotate(-12deg) skewX(-10deg); opacity: 0; }
+  18%  { opacity: .9; }
+  50%  { transform: translate(-50%, -50%) rotate(-3deg) skewX(-3deg); opacity: .85; }
+  82%  { opacity: .55; }
+  100% { transform: translate( 160%, -50%) rotate(  8deg) skewX( 6deg); opacity: 0; }
+}
+
 /* ---- tech chips ---- */
 .chips { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
 .ichip {

@@ -2,33 +2,50 @@
 import os
 import sys
 
-# Make `import opus_loader / audio / net / ui` work when frozen by PyInstaller
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QIcon
 
-import opus_loader  # noqa: F401   (loads libopus before anything else)
-from ui import LoginDialog, MainWindow, DARK_QSS
+import opus_loader      # noqa: F401  (must load before opuslib import)
+import theme
+from welcome import Welcome
+from ui import LoginDialog, MainWindow
 
 
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("PhantomTalk")
-    app.setStyleSheet(DARK_QSS)
 
-    login = LoginDialog()
-    if not login.exec():
-        return 0
+    # Load bundled Claude-style fonts (Playfair Display + Inter) before applying QSS.
+    theme.load_fonts()
+    app.setStyleSheet(theme.qss())
 
-    win = MainWindow(
-        base_url=login.server_url.text().strip(),
-        server_id=login.selected_server_id,
-        nickname=login.nick.text().strip() or "Phantom",
-    )
-    win.show()
+    win_ref = {}            # keep refs alive
+
+    def open_login():
+        login = LoginDialog()
+        if not login.exec():
+            app.quit(); return
+        m = MainWindow(
+            base_url=login.server_url.text().strip(),
+            server_id=login.selected_server_id,
+            nickname=login.nick.text().strip() or "Phantom",
+        )
+        win_ref["m"] = m
+        m.show()
+
+    # First-launch welcome (skippable). Then proceed to login.
+    show_welcome = os.environ.get("PT_NO_WELCOME") != "1"
+    if show_welcome:
+        w = Welcome()
+        win_ref["w"] = w
+        w.showMaximized()
+        w.finished.connect(open_login)
+    else:
+        open_login()
+
     return app.exec()
 
 

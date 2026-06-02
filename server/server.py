@@ -60,6 +60,7 @@ class Session:
     ws: Optional[WebSocket] = None
     muted: bool = False
     deafened: bool = False
+    screen_target: str = ""             # token_hex of peer we're streaming our screen to
     last_seen: float = field(default_factory=time.time)
 
     @property
@@ -260,6 +261,21 @@ async def create_channel(sid: int, req: CreateChannelReq):
 
 # ----------------------------- WebSocket signaling ---------------------------
 
+async def _send_to_token(token_hex: str, msg: dict):
+    """Send a JSON message to the session identified by hex token."""
+    try:
+        token = bytes.fromhex(token_hex)
+    except Exception:
+        return
+    s = SESSIONS.get(token)
+    if not s or s.ws is None:
+        return
+    try:
+        await s.ws.send_text(json.dumps(msg, ensure_ascii=False))
+    except Exception:
+        pass
+
+
 async def broadcast_server(sid: int, msg: dict):
     data = json.dumps(msg, ensure_ascii=False)
     dead = []
@@ -385,6 +401,54 @@ async def ws_endpoint(ws: WebSocket, sid: int):
                 pass
             elif t == "ping":
                 await ws.send_text(json.dumps({"type": "pong", "ts": m.get("ts")}))
+
+            # ---------------- DIRECT MESSAGES + 1-on-1 CALLS ----------------
+            elif t == "dm":
+                await _send_to_token(m.get("to", ""), {
+                    "type": "dm",
+                    "from": sess.token_hex, "nick": sess.nickname,
+                    "text": str(m.get("text", ""))[:2000],
+                    "ts": int(time.time()),
+                })
+            elif t == "call_invite":
+                # invite a peer to a 1-on-1 voice call (negative channel id, ephemeral)
+                target = m.get("to", "")
+                room = abs(hash((sess.token_hex, target))) % 10_000_000 + 1_000_000_000
+                await _send_to_token(target, {
+                    "type": "call_invite",
+                    "from": sess.token_hex, "nick": sess.nickname, "room": room,
+                })
+                await ws.send_text(json.dumps({"type": "call_pending", "to": target, "room": room}))
+            elif t == "call_accept":
+                room = int(m.get("room", 0))
+                target = m.get("to", "")
+                await _send_to_token(target, {"type": "call_accepted", "from": sess.token_hex, "room": room})
+                await move_session(sess, -room)              # negative cid = direct room
+            elif t == "call_decline":
+                await _send_to_token(m.get("to", ""), {"type": "call_declined", "from": sess.token_hex})
+            elif t == "call_hangup":
+                await _send_to_token(m.get("to", ""), {"type": "call_hangup", "from": sess.token_hex})
+                await move_session(sess, None)
+
+            # ---------------- SCREEN SHARE (JPEG frames over WS) -------------
+            elif t == "screen_start":
+                target = m.get("to", "")
+                sess.screen_target = target
+                await _send_to_token(target, {"type": "screen_start", "from": sess.token_hex, "nick": sess.nickname})
+            elif t == "screen_stop":
+                tgt = getattr(sess, "screen_target", "")
+                if tgt:
+                    await _send_to_token(tgt, {"type": "screen_stop", "from": sess.token_hex})
+                sess.screen_target = ""
+            elif t == "screen_frame":
+                tgt = getattr(sess, "screen_target", "")
+                if tgt:
+                    await _send_to_token(tgt, {
+                        "type": "screen_frame",
+                        "from": sess.token_hex,
+                        "w": int(m.get("w", 0)), "h": int(m.get("h", 0)),
+                        "jpeg": m.get("jpeg", ""),   # base64
+                    })
     except WebSocketDisconnect:
         pass
     except Exception as e:

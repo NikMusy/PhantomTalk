@@ -65,10 +65,17 @@
         line(s, 'кбит/с · stereo', 'md glow', 1.5);
         line(s, '× 5 к голосу Discord', 'sub', 2.2);
     }},
-    { dur: 10000, build(s) {                      // 5 · what you get
+    { dur: 9000, build(s) {                       // 5 · what you get
         line(s, 'Свои серверы', 'lg', 0.0);
         line(s, 'Свои каналы', 'lg', 0.7);
         line(s, 'Только твой звук', 'lg glow', 1.4);
+    }},
+    { dur: 8500, build(s) {                       // 5.5 · Russia
+        const flag = document.createElement('div'); flag.className = 'ru-flag';
+        flag.innerHTML = '<i class="b-white"></i><i class="b-blue"></i><i class="b-red"></i>';
+        s.appendChild(flag);
+        line(s, 'Работает в РФ', 'lg glow', 0.2);
+        line(s, 'без VPN · без блокировок · твоя инфраструктура', 'sub', 1.2);
     }},
     { dur: 7000, build(s) {                       // 6 · tech
         const c = document.createElement('div'); c.className = 'chips'; s.appendChild(c);

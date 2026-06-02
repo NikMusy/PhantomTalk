@@ -26,9 +26,11 @@ def main():
         sys.exit(2)
 
     # PyInstaller path-sep for --add-data on Windows is `;`
+    fonts_dir = os.path.join(CLIENT, "fonts")
     add_data = [
         f"{OPUS_DLL};.",
         f"{OPUS_DLL};libs",
+        f"{fonts_dir};fonts",
     ]
     cmd = [
         sys.executable, "-m", "PyInstaller",

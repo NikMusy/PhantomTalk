@@ -38,10 +38,19 @@ class NetClient(QObject):
     connected     = pyqtSignal(dict)            # welcome payload
     disconnected  = pyqtSignal(str)             # reason
     presence      = pyqtSignal(list)            # users list
-    chat          = pyqtSignal(dict)            # chat msg
+    chat          = pyqtSignal(dict)            # chat msg in channel
     channel_added = pyqtSignal(dict)
     error         = pyqtSignal(str)
     voice_packet  = pyqtSignal(bytes, int, bytes)  # src_token, seq, payload
+    dm            = pyqtSignal(dict)            # direct message
+    call_invite   = pyqtSignal(dict)            # incoming call invite
+    call_pending  = pyqtSignal(dict)            # our outgoing invite acknowledged
+    call_accepted = pyqtSignal(dict)            # peer accepted, room id provided
+    call_declined = pyqtSignal(dict)
+    call_hangup   = pyqtSignal(dict)
+    screen_start  = pyqtSignal(dict)
+    screen_stop   = pyqtSignal(dict)
+    screen_frame  = pyqtSignal(dict)            # {from, w, h, jpeg}
 
     def __init__(self, base_url: str):
         super().__init__()
@@ -129,6 +138,24 @@ class NetClient(QObject):
                     self.channel_added.emit(m)
                 elif t == "error":
                     self.error.emit(m.get("msg", ""))
+                elif t == "dm":
+                    self.dm.emit(m)
+                elif t == "call_invite":
+                    self.call_invite.emit(m)
+                elif t == "call_pending":
+                    self.call_pending.emit(m)
+                elif t == "call_accepted":
+                    self.call_accepted.emit(m)
+                elif t == "call_declined":
+                    self.call_declined.emit(m)
+                elif t == "call_hangup":
+                    self.call_hangup.emit(m)
+                elif t == "screen_start":
+                    self.screen_start.emit(m)
+                elif t == "screen_stop":
+                    self.screen_stop.emit(m)
+                elif t == "screen_frame":
+                    self.screen_frame.emit(m)
         except Exception as e:
             self.error.emit(f"net: {e}")
         finally:
@@ -191,6 +218,33 @@ class NetClient(QObject):
 
     def send_chat(self, text: str):
         self._send_ws({"type": "chat", "text": text})
+
+    # ----- direct messages + 1-on-1 calls + screen-share -----
+    def send_dm(self, to_token: str, text: str):
+        self._send_ws({"type": "dm", "to": to_token, "text": text})
+
+    def call_invite_to(self, to_token: str):
+        self._send_ws({"type": "call_invite", "to": to_token})
+
+    def call_accept(self, to_token: str, room: int):
+        self.channel_id = -int(room)
+        self._send_ws({"type": "call_accept", "to": to_token, "room": int(room)})
+
+    def call_decline(self, to_token: str):
+        self._send_ws({"type": "call_decline", "to": to_token})
+
+    def call_hangup_to(self, to_token: str):
+        self.channel_id = None
+        self._send_ws({"type": "call_hangup", "to": to_token})
+
+    def screen_start_to(self, to_token: str):
+        self._send_ws({"type": "screen_start", "to": to_token})
+
+    def screen_stop_to(self):
+        self._send_ws({"type": "screen_stop"})
+
+    def screen_send_frame(self, w: int, h: int, jpeg_b64: str):
+        self._send_ws({"type": "screen_frame", "w": w, "h": h, "jpeg": jpeg_b64})
 
     # ---------- voice UDP ---------------------------------------------------
     def _send_udp_raw(self, payload: bytes):
