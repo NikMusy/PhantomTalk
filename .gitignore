@@ -26,3 +26,7 @@ Thumbs.db
 
 # do not ship the 50MB binary in git (release it instead)
 website/PhantomTalk.exe
+
+# temp video frame extraction
+_frames/
+build.log

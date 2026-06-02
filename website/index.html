@@ -4,15 +4,29 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>PhantomTalk — голос, который слышно</title>
-<meta name="description" content="Голосовой мессенджер с собственными серверами. Opus 510 кбит/с stereo, до 5× качество Discord. Бесплатно. Свой сервер за минуту." />
+<meta name="description" content="Голосовой мессенджер с собственными серверами. Opus 510 кбит/с stereo, до 5× качество Discord. Бесплатно." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body>
+<body class="intro-lock">
 
+<!-- ============================ CINEMATIC INTRO ============================ -->
+<div id="intro">
+  <div class="intro-flare"></div>
+  <div class="intro-rings"><span></span><span></span><span></span><span></span></div>
+  <div class="intro-core">
+    <div class="intro-orb"></div>
+    <div class="intro-word" data-word="PhantomTalk"></div>
+    <div class="intro-tag">голос · который · слышно</div>
+  </div>
+  <div class="intro-skip" id="intro-skip">пропустить ▸</div>
+</div>
+
+<!-- ambient layers -->
 <canvas id="bg-canvas"></canvas>
+<div class="ambient-rings"><i></i><i></i><i></i></div>
 
 <header class="nav">
   <div class="brand">
@@ -24,6 +38,7 @@
     <a href="#battle">vs Discord</a>
     <a href="#servers">Серверы</a>
     <a href="#create">Создать</a>
+    <a id="replay-intro" title="Повторить интро">↺</a>
     <a href="#download" class="cta">Скачать</a>
   </nav>
 </header>
@@ -34,7 +49,7 @@
 <section class="hero">
   <div class="hero-inner">
     <span class="pill"><span class="dot"></span> Opus · 48 kHz · до 510 кбит/с stereo</span>
-    <h1>Голос, <span class="grad">который слышно</span><br/>по-настоящему.</h1>
+    <h1 class="kin" data-kin>Голос, который |glow:слышно| по-настоящему.</h1>
     <p class="lead">
       PhantomTalk — голосовой сервер для тех, кто устал от сжатого «дискордного» хрипа.
       Свои каналы. Свои правила. До <b>510 кбит/с Opus stereo</b> — в&nbsp;<b>5&nbsp;раз выше</b>,
@@ -45,14 +60,14 @@
       <a class="btn-ghost" href="#create">Поднять свой сервер</a>
     </div>
     <div class="badges">
-      <div><b data-counter="40" data-suffix=" мс">0 мс</b><br/><span>задержка end-to-end</span></div>
-      <div><b data-counter="510" data-suffix=" кбит">0</b><br/><span>битрейт Opus stereo</span></div>
+      <div><b data-counter="40" data-suffix=" мс">0</b><br/><span>задержка end-to-end</span></div>
+      <div><b data-counter="510" data-suffix="">0</b><br/><span>кбит/с Opus stereo</span></div>
       <div><b data-counter="0" data-suffix=" ₽">0 ₽</b><br/><span>без подписок навсегда</span></div>
     </div>
   </div>
 
   <div class="hero-art">
-    <div class="orb"></div>
+    <div class="v-orb"></div>
     <div class="waveform">
       <span></span><span></span><span></span><span></span><span></span><span></span>
       <span></span><span></span><span></span><span></span><span></span><span></span>
@@ -67,29 +82,16 @@
 <!-- ============================ MARQUEE ============================ -->
 <section class="compare">
   <div class="marquee">
-    <span>Opus 510 kbps</span><span>·</span>
-    <span>UDP relay</span><span>·</span>
-    <span>0 пересжатий</span><span>·</span>
-    <span>TS3-style каналы</span><span>·</span>
-    <span>self-hosted</span><span>·</span>
-    <span><b>5× качество Discord</b></span><span>·</span>
-    <span>open protocol</span><span>·</span>
-    <span>20 ms frames</span><span>·</span>
-    <span>jitter buffer</span><span>·</span>
-    <span>Opus FEC</span><span>·</span>
-    <span>noise gate</span><span>·</span>
-
-    <span>Opus 510 kbps</span><span>·</span>
-    <span>UDP relay</span><span>·</span>
-    <span>0 пересжатий</span><span>·</span>
-    <span>TS3-style каналы</span><span>·</span>
-    <span>self-hosted</span><span>·</span>
-    <span><b>5× качество Discord</b></span><span>·</span>
-    <span>open protocol</span><span>·</span>
-    <span>20 ms frames</span><span>·</span>
-    <span>jitter buffer</span><span>·</span>
-    <span>Opus FEC</span><span>·</span>
-    <span>noise gate</span><span>·</span>
+    <span>Opus 510 kbps</span><span>·</span><span>UDP relay</span><span>·</span>
+    <span>0 пересжатий</span><span>·</span><span>TS3-style каналы</span><span>·</span>
+    <span>self-hosted</span><span>·</span><span><b>5× качество Discord</b></span><span>·</span>
+    <span>open protocol</span><span>·</span><span>20 ms frames</span><span>·</span>
+    <span>jitter buffer</span><span>·</span><span>Opus FEC</span><span>·</span><span>noise gate</span><span>·</span>
+    <span>Opus 510 kbps</span><span>·</span><span>UDP relay</span><span>·</span>
+    <span>0 пересжатий</span><span>·</span><span>TS3-style каналы</span><span>·</span>
+    <span>self-hosted</span><span>·</span><span><b>5× качество Discord</b></span><span>·</span>
+    <span>open protocol</span><span>·</span><span>20 ms frames</span><span>·</span>
+    <span>jitter buffer</span><span>·</span><span>Opus FEC</span><span>·</span><span>noise gate</span><span>·</span>
   </div>
 </section>
 
@@ -97,42 +99,12 @@
 <section id="features" class="features">
   <h2 class="reveal">Почему PhantomTalk <span class="grad">&gt; Discord</span></h2>
   <div class="grid">
-    <div class="card reveal">
-      <div class="icon">🎵</div>
-      <h3>510 кбит/с stereo</h3>
-      <p>Полноценный музыкальный Opus вместо разговорного 64 кбит/с моно.
-         Слышно педали, дыхание, шорох клавиатуры — всё, как есть.</p>
-    </div>
-    <div class="card reveal">
-      <div class="icon">🏠</div>
-      <h3>Своя инфраструктура</h3>
-      <p>Один .py + SQLite — поднимется на VPS за рубль, на твоём ПК или
-         в локалке. Никто не лезет к твоему голосу.</p>
-    </div>
-    <div class="card reveal">
-      <div class="icon">🌳</div>
-      <h3>TS3-style каналы</h3>
-      <p>Дерево каналов, серверы, admin-токены, push-to-talk и голосовая
-         активация. Привычная архитектура, не «гильдии».</p>
-    </div>
-    <div class="card reveal">
-      <div class="icon">⚡</div>
-      <h3>Минимум задержки</h3>
-      <p>Чистый UDP relay без TURN/STUN-плясок. Сервер форвардит Opus-пакеты
-         без декодирования — никакого пересжатия.</p>
-    </div>
-    <div class="card reveal">
-      <div class="icon">🎧</div>
-      <h3>Не вместо, а вместе</h3>
-      <p>Сиди в Discord с тусовкой — общайся с другом в PhantomTalk
-         параллельно. Два аудио-устройства, два мира.</p>
-    </div>
-    <div class="card reveal">
-      <div class="icon">📡</div>
-      <h3>Открытый протокол</h3>
-      <p>UDP-формат пакета описан в 6 строках. Хочешь — пиши свой клиент.
-         Хочешь — пиши свой сервер. Никаких блобов.</p>
-    </div>
+    <div class="card reveal"><div class="icon">🎵</div><h3>510 кбит/с stereo</h3><p>Полноценный музыкальный Opus вместо разговорного 64 кбит/с моно. Слышно педали, дыхание, шорох клавиатуры — всё, как есть.</p></div>
+    <div class="card reveal"><div class="icon">🏠</div><h3>Своя инфраструктура</h3><p>Один .py + SQLite — поднимется на VPS за рубль, на твоём ПК или в локалке. Никто не лезет к твоему голосу.</p></div>
+    <div class="card reveal"><div class="icon">🌳</div><h3>TS3-style каналы</h3><p>Дерево каналов, серверы, admin-токены, push-to-talk и голосовая активация. Привычная архитектура, не «гильдии».</p></div>
+    <div class="card reveal"><div class="icon">⚡</div><h3>Минимум задержки</h3><p>Чистый UDP relay без TURN/STUN-плясок. Сервер форвардит Opus-пакеты без декодирования — никакого пересжатия.</p></div>
+    <div class="card reveal"><div class="icon">🎧</div><h3>Не вместо, а вместе</h3><p>Сиди в Discord с тусовкой — общайся с другом в PhantomTalk параллельно. Два аудио-устройства, два мира.</p></div>
+    <div class="card reveal"><div class="icon">📡</div><h3>Открытый протокол</h3><p>UDP-формат пакета описан в 6 строках. Хочешь — пиши свой клиент. Хочешь — пиши свой сервер. Никаких блобов.</p></div>
   </div>
 </section>
 
@@ -143,7 +115,7 @@
     <div class="bar-card bad reveal">
       <h3>Discord</h3>
       <div class="sub">обычный голосовой канал</div>
-      <div class="num">64<small> кбит/с моно</small></div>
+      <div class="num">64<small>кбит/с моно</small></div>
       <div class="bar"><div data-w="12"></div></div>
       <ul>
         <li>принудительная нормализация громкости</li>
@@ -155,7 +127,7 @@
     <div class="bar-card good reveal">
       <h3>PhantomTalk</h3>
       <div class="sub">по умолчанию · бесплатно</div>
-      <div class="num">510<small> кбит/с stereo</small></div>
+      <div class="num">510<small>кбит/с stereo</small></div>
       <div class="bar"><div data-w="100"></div></div>
       <ul>
         <li>чистый Opus без пересжатия на сервере</li>
@@ -171,22 +143,16 @@
 <section id="servers" class="servers">
   <h2 class="reveal">Публичные <span class="grad">серверы</span></h2>
   <div id="servers-list" class="server-list reveal">Загрузка…</div>
-  <div style="margin-top: 18px;"><button class="btn-ghost" onclick="loadServers()">Обновить</button></div>
+  <div style="margin-top:18px;"><button class="btn-ghost" onclick="loadServers()">Обновить</button></div>
 </section>
 
 <!-- ============================ CREATE ============================ -->
 <section id="create" class="create">
   <h2 class="reveal">Создать <span class="grad">свой сервер</span></h2>
   <form id="create-form" class="create-form reveal" onsubmit="return createServer(event)">
-    <label>Название
-      <input type="text" name="name" required maxlength="60" placeholder="Наш голосовой штаб" />
-    </label>
-    <label>Описание
-      <input type="text" name="description" maxlength="120" placeholder="Где общаются настоящие пацаны" />
-    </label>
-    <label>Макс. пользователей
-      <input type="number" name="max_users" value="64" min="2" max="512" />
-    </label>
+    <label>Название<input type="text" name="name" required maxlength="60" placeholder="Наш голосовой штаб" /></label>
+    <label>Описание<input type="text" name="description" maxlength="120" placeholder="Где общаются настоящие пацаны" /></label>
+    <label>Макс. пользователей<input type="number" name="max_users" value="64" min="2" max="512" /></label>
     <button class="btn-primary" type="submit">Поднять сервер</button>
     <pre id="create-result"></pre>
   </form>
@@ -199,7 +165,7 @@
     <div>
       <h3>PhantomTalk.exe</h3>
       <p>Windows 10/11 · 64-bit · собран PyInstaller с встроенным libopus</p>
-      <p style="margin: 14px 0;"><a class="btn-primary" href="/static/PhantomTalk.exe" download>⬇ Скачать .exe</a></p>
+      <p style="margin:14px 0;"><a class="btn-primary" href="/static/PhantomTalk.exe" download>⬇ Скачать .exe</a></p>
       <p class="hint">Альтернатива: <code>python client/main.py</code> из исходников.</p>
       <p class="hint"><a href="https://github.com/NikMusy/PhantomTalk" target="_blank">📂 GitHub репозиторий</a></p>
     </div>
