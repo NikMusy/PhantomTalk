@@ -24,8 +24,13 @@ Thumbs.db
 .vscode/
 .idea/
 
-# do not ship the 50MB binary in git (release it instead)
+# do not ship big binaries in git (release them instead)
 website/PhantomTalk.exe
+website/PhantomTalkSetup.exe
+
+# temp screenshots / debug
+_*.png
+_inst_err.txt
 
 # temp video frame extraction
 _frames/
