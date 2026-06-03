@@ -142,4 +142,76 @@ QToolTip {{
     background: {c['card']}; color: {c['text']}; border: 1px solid {c['line']};
     padding: 6px 10px; border-radius: 6px;
 }}
+
+/* ============================ APP CHROME (Discord-style, ember) ============ */
+QWidget#TitleBar {{ background: {c['bg']}; }}
+QLabel#wordmark {{ font-family: '{SERIF_FAMILY}'; color: {c['amber']}; font-size: 12pt; font-weight: 800; }}
+QPushButton#winBtn {{
+    background: transparent; border: none; color: {c['dim']}; border-radius: 6px;
+    min-width: 34px; max-width: 34px; min-height: 26px; max-height: 26px; font-size: 11pt;
+}}
+QPushButton#winBtn:hover {{ background: rgba(255,255,255,0.08); color: {c['text']}; }}
+QPushButton#winClose:hover {{ background: {c['crimson']}; color: white; }}
+
+QWidget#ServerRail   {{ background: #0c0807; }}
+QWidget#ChannelPanel {{ background: #100b09; border-left: 1px solid {c['line']}; border-right: 1px solid {c['line']}; }}
+QWidget#ContentPanel {{ background: {c['bg']}; }}
+QWidget#MemberPanel  {{ background: #100b09; border-left: 1px solid {c['line']}; }}
+QWidget#ChannelHeader, QWidget#ContentHeader, QWidget#MemberHeader {{ border-bottom: 1px solid {c['line']}; }}
+QWidget#UserPanel    {{ background: #0c0807; border-top: 1px solid {c['line']}; }}
+
+QLabel#serverName  {{ font-family: '{SERIF_FAMILY}'; font-size: 14pt; font-weight: 800; color: {c['text']}; }}
+QLabel#contentTitle{{ font-family: '{SERIF_FAMILY}'; font-size: 13pt; font-weight: 700; color: {c['text']}; }}
+QLabel#sectionLabel{{ color: {c['dim']}; font-size: 8pt; font-weight: 700; }}
+QLabel#userNick    {{ color: {c['text']}; font-weight: 600; }}
+QLabel#userStatus  {{ color: {c['dim']}; font-size: 8pt; }}
+
+QPushButton#serverPill {{
+    background: {c['card']}; color: {c['amber']}; border: 1px solid {c['line']};
+    border-radius: 16px; font-family: '{SERIF_FAMILY}'; font-size: 15pt; font-weight: 800;
+}}
+QPushButton#serverPill:hover {{
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 {c['crimson']}, stop:1 {c['ember']});
+    color: white; border-color: transparent; border-radius: 18px;
+}}
+QPushButton#serverPill:checked {{
+    border: 2px solid {c['ember']}; color: {c['amber']}; border-radius: 18px;
+    background: rgba(255,106,44,0.12);
+}}
+QPushButton#railHome {{
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 {c['crimson']}, stop:1 {c['ember']});
+    color: white; border: none; border-radius: 16px; font-size: 16pt;
+}}
+QPushButton#railHome:hover {{ border-radius: 18px; }}
+QPushButton#railHome:checked {{ border: 2px solid {c['amber']}; border-radius: 18px; }}
+QPushButton#railAdd {{
+    background: {c['card']}; color: {c['ember']}; border: 1px dashed {c['line']};
+    border-radius: 16px; font-size: 16pt; font-weight: 700;
+}}
+QPushButton#railAdd:hover {{ background: rgba(255,106,44,0.12); border-color: {c['ember']}; color: {c['amber']}; border-radius: 18px; }}
+
+QPushButton#iconBtn {{ background: transparent; border: none; color: {c['dim']}; border-radius: 8px; padding: 6px; font-size: 12pt; }}
+QPushButton#iconBtn:hover {{ background: rgba(255,106,44,0.12); color: {c['amber']}; }}
+QPushButton#iconBtn:checked {{ background: rgba(214,31,18,0.30); color: white; }}
+
+QTreeWidget#channelTree, QListWidget#memberList, QListWidget#dmList {{
+    background: transparent; border: none;
+}}
+QTreeWidget#channelTree::item {{ height: 34px; border-radius: 8px; padding-left: 4px; }}
+QTreeWidget#channelTree::item:hover {{ background: rgba(255,106,44,0.07); }}
+QTreeWidget#channelTree::item:selected {{ background: rgba(255,106,44,0.16); color: {c['amber']}; }}
+QTreeWidget#channelTree::branch {{ background: transparent; border-image: none; image: none; }}
+QListWidget#memberList::item, QListWidget#dmList::item {{ height: 46px; border-radius: 8px; }}
+QListWidget#memberList::item:hover, QListWidget#dmList::item:hover {{ background: rgba(255,106,44,0.07); }}
+QListWidget#dmList::item:selected {{ background: rgba(255,106,44,0.16); }}
+
+QTextEdit#chat, QTextEdit#dmChat {{ background: transparent; border: none; }}
+QLineEdit#chatInput, QLineEdit#dmInput {{
+    background: {c['card']}; border: 1px solid {c['line']}; border-radius: 12px; padding: 11px 14px;
+}}
+QLineEdit#chatInput:focus, QLineEdit#dmInput:focus {{ border: 1px solid {c['ember']}; }}
+
+QWidget#GlassCard {{
+    background: {c['card']}; border: 1px solid {c['line']}; border-radius: 18px;
+}}
 """

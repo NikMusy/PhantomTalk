@@ -514,9 +514,9 @@ class Welcome(QWidget):
     def _emit_finished(self):
         try: self._timer.stop()
         except Exception: pass
+        # When embedded in the app stack, the parent decides what to do next
+        # (switch views, free this widget). We just signal completion.
         self.finished.emit()
-        self.hide()
-        self.deleteLater()
 
     def keyPressEvent(self, e):
         if e.key() in (Qt.Key.Key_Escape, Qt.Key.Key_Space, Qt.Key.Key_Return):

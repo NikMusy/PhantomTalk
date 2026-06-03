@@ -30,3 +30,4 @@ website/PhantomTalk.exe
 # temp video frame extraction
 _frames/
 build.log
+_shot.png
