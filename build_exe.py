@@ -18,7 +18,7 @@ DIST   = os.path.join(HERE, "dist")
 
 OPUS_DLL = os.path.join(LIBS, "opus.dll")
 ENTRY    = os.path.join(CLIENT, "main.py")
-ICON     = None  # set to a .ico path if you add one
+ICON     = os.path.join(CLIENT, "phantomtalk.ico")
 
 def main():
     if not os.path.isfile(OPUS_DLL):
@@ -27,10 +27,13 @@ def main():
 
     # PyInstaller path-sep for --add-data on Windows is `;`
     fonts_dir = os.path.join(CLIENT, "fonts")
+    icon_png  = os.path.join(CLIENT, "phantomtalk.png")
     add_data = [
         f"{OPUS_DLL};.",
         f"{OPUS_DLL};libs",
         f"{fonts_dir};fonts",
+        f"{ICON};.",
+        f"{icon_png};.",
     ]
     cmd = [
         sys.executable, "-m", "PyInstaller",
