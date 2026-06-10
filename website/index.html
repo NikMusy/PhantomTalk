@@ -35,8 +35,10 @@
   <nav>
     <a href="#features">Возможности</a>
     <a href="#battle">vs Discord</a>
+    <a href="#chat">Чат</a>
     <a href="#servers">Серверы</a>
-    <a href="#create">Создать</a>
+    <a href="#browser">Браузер</a>
+    <a href="#creator">Создатель</a>
     <a id="replay-intro" title="Повторить интро">↺</a>
     <a href="#download" class="cta">Скачать</a>
   </nav>
@@ -138,6 +140,22 @@
   </div>
 </section>
 
+<!-- ============================ LIVE CHAT ============================ -->
+<section id="chat" class="livechat">
+  <h2 class="reveal">Живой <span class="grad">чат</span></h2>
+  <p class="lead reveal" style="margin-bottom:22px;">Общайся прямо здесь — все, кто сейчас на сайте, увидят твоё сообщение. <span id="chat-online" style="color:var(--ember-2); font-weight:600;"></span></p>
+  <div class="chat-card reveal">
+    <div id="chat-log" class="chat-log">
+      <div class="chat-msg sys">подключение к чату…</div>
+    </div>
+    <form class="chat-form" onsubmit="return webchatSend(event)">
+      <input id="chat-nick" type="text" maxlength="24" placeholder="ник" />
+      <input id="chat-text" type="text" maxlength="500" placeholder="Сообщение…" autocomplete="off" />
+      <button class="btn-primary" type="submit">➤</button>
+    </form>
+  </div>
+</section>
+
 <!-- ============================ SERVERS ============================ -->
 <section id="servers" class="servers">
   <h2 class="reveal">Публичные <span class="grad">серверы</span></h2>
@@ -155,6 +173,61 @@
     <button class="btn-primary" type="submit">Поднять сервер</button>
     <pre id="create-result"></pre>
   </form>
+</section>
+
+<!-- ============================ PHANTOM BROWSER ============================ -->
+<section id="browser" class="browser-promo">
+  <h2 class="reveal">Экосистема <span class="grad">Phantom</span></h2>
+  <div class="eco-grid">
+    <div class="eco-card reveal">
+      <div class="eco-icon">🌐</div>
+      <h3>PhantomBrowser</h3>
+      <p>Наш собственный браузер на замену Chrome и Comet. Тот же ember-стиль,
+         та же философия: быстро, своё, без слежки. Уже в разработке у того же
+         автора — выйдет следом за PhantomTalk.</p>
+      <span class="eco-badge">скоро</span>
+    </div>
+    <div class="eco-card reveal active">
+      <div class="eco-icon">🎙</div>
+      <h3>PhantomTalk</h3>
+      <p>Голосовой мессенджер, который ты сейчас видишь. Серверы, каналы, ЛС,
+         звонки, демонстрация экрана и звук до 510 кбит/с — уже можно скачать
+         и пользоваться.</p>
+      <span class="eco-badge live">доступно</span>
+    </div>
+    <div class="eco-card reveal">
+      <div class="eco-icon">⚙</div>
+      <h3>Phantom*</h3>
+      <p>Дальше — больше. Экосистема растёт: инструменты для стримов, оверлеи,
+         телеметрия. Всё в одном стиле, всё своё. Следи за GitHub.</p>
+      <span class="eco-badge">в планах</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CREATOR ============================ -->
+<section id="creator" class="creator">
+  <h2 class="reveal">Кто это <span class="grad">сделал</span></h2>
+  <div class="creator-card reveal">
+    <div class="creator-story">
+      <p><b class="amber">NikMusy</b> — человек, который решил, что Discord звучит как рация,
+         и вместо того чтобы жаловаться — собрал собственный голосовой мессенджер.
+         Шпарил днями и ночами: днём — идеи и «сделай круче», ночью — тесты звука
+         с кентом и правки «чтоб не хрипело». Упрямство уровня: если нет нормального
+         войса — будет свой. Если нет нормального браузера — будет PhantomBrowser.</p>
+      <p>А код вместе с ним писала целая команда искусственных интеллектов
+         <b class="amber">Claude от Anthropic</b> — они сменяли друг друга как смены на заводе:</p>
+    </div>
+    <div class="ai-team">
+      <div class="ai-chip reveal"><i></i><b>Claude Opus</b><span>архитектура и тяжёлые рефакторы</span></div>
+      <div class="ai-chip reveal"><i></i><b>Claude Sonnet</b><span>фичи, фиксы, ночные смены</span></div>
+      <div class="ai-chip reveal"><i></i><b>Claude Fable</b><span>анимации и кинематографичность</span></div>
+      <div class="ai-chip reveal"><i></i><b>NikMusy</b><span>виженер, тестировщик, директор завода</span></div>
+    </div>
+    <p class="creator-footer reveal">Опус проектировал серверный релей, Соннет паял UDP-пакеты,
+       Фейбл полировал каждую анимацию до блеска — а НикМуси гонял всех тапком и проверял звук в наушниках.
+       Результат — перед тобой. <span class="amber">Сделано людьми и ИИ, днями и ночами.</span></p>
+  </div>
 </section>
 
 <!-- ============================ DOWNLOAD ============================ -->

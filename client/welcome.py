@@ -278,6 +278,10 @@ class Welcome(QWidget):
         self._orb_pulse = 0.0
         self._ring_rot = 0.0
         self._flare_t = -1.0
+        self._bg_cache = None   # static gradient layer, cached per size
+        # ember sparks: one pre-rendered sprite, blitted per particle
+        self._spark_pix = None
+        self._sparks = [self._mk_spark(True) for _ in range(32)]
         self._timer = QTimer(self); self._timer.timeout.connect(self._tick); self._timer.start(33)
 
         # skip button (top-right)
@@ -319,6 +323,14 @@ class Welcome(QWidget):
         self._start_t = None
         QTimer.singleShot(150, self._run_next)
 
+    def _mk_spark(self, seed: bool) -> dict:
+        w = max(1, self.width()); h = max(1, self.height())
+        return {
+            "x": random.uniform(0, w), "y": random.uniform(0, h) if seed else h + 10,
+            "r": random.uniform(6, 18), "vy": random.uniform(0.4, 1.3),
+            "vx": random.uniform(-0.3, 0.3), "life": random.random(),
+        }
+
     # -------- ambient painter --------
     def _tick(self):
         self._orb_pulse = (self._orb_pulse + 0.04) % (math.pi * 2)
@@ -326,19 +338,31 @@ class Welcome(QWidget):
         if self._flare_t >= 0:
             self._flare_t = min(1.0, self._flare_t + 0.025)
             if self._flare_t >= 1.0: self._flare_t = -1.0
+        for s in self._sparks:
+            s["y"] -= s["vy"]; s["x"] += s["vx"]; s["life"] += 0.02
+            if s["y"] < -20:
+                s.update(self._mk_spark(False))
         self.update()
 
     def paintEvent(self, e: QPaintEvent):
         p = QPainter(self); p.setRenderHint(QPainter.RenderHint.Antialiasing)
         W, H = self.width(), self.height(); cx, cy = W/2, H/2
 
-        # background gradient: black with red bottom glow
-        g = QRadialGradient(QPointF(cx, H*1.0), max(W, H))
-        g.setColorAt(0.0, QColor(214, 31, 18, 110))
-        g.setColorAt(0.45, QColor(214, 31, 18, 30))
-        g.setColorAt(1.0, QColor(10, 6, 5, 0))
-        p.fillRect(self.rect(), QColor(COLORS["bg"]))
-        p.fillRect(self.rect(), QBrush(g))
+        # background gradient: cached pixmap (repainting big radial gradients
+        # every 33ms frame was the main source of dropped frames)
+        if self._bg_cache is None or self._bg_cache.width() != W or self._bg_cache.height() != H:
+            from PyQt6.QtGui import QPixmap
+            pm = QPixmap(max(1, W), max(1, H))
+            bp = QPainter(pm)
+            bp.fillRect(0, 0, W, H, QColor(COLORS["bg"]))
+            g = QRadialGradient(QPointF(cx, H*1.0), max(W, H))
+            g.setColorAt(0.0, QColor(214, 31, 18, 110))
+            g.setColorAt(0.45, QColor(214, 31, 18, 30))
+            g.setColorAt(1.0, QColor(10, 6, 5, 0))
+            bp.fillRect(0, 0, W, H, QBrush(g))
+            bp.end()
+            self._bg_cache = pm
+        p.drawPixmap(0, 0, self._bg_cache)
 
         # concentric conic rings, faint
         for k, (r, alpha, dir_) in enumerate([(180, 70, 1), (300, 45, -1), (440, 28, 1), (580, 18, -1)]):
@@ -365,6 +389,14 @@ class Welcome(QWidget):
         p.drawEllipse(QPointF(cx, cy * 0.42), orb_r * 6, orb_r * 6)
         # solid core
         p.setBrush(QColor(255, 220, 180)); p.drawEllipse(QPointF(cx, cy * 0.42), orb_r, orb_r)
+
+        # ember sparks: simple antialiased dots (no sprite — keep paint simple)
+        for s in self._sparks:
+            fl = 0.5 + 0.5 * math.sin(s["life"] * 6.283)
+            sz = s["r"] * (0.35 + 0.30 * fl)
+            col = QColor(255, 150, 70, int(90 + 130 * fl))
+            p.setBrush(col); p.setPen(Qt.PenStyle.NoPen)
+            p.drawEllipse(QPointF(s["x"], s["y"]), sz, sz)
 
         # lens-flare sweep on scene transitions
         if self._flare_t >= 0:

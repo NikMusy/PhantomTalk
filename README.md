@@ -1,24 +1,43 @@
-# PhantomTalk
+<p align="center">
+  <img src="client/phantomtalk.png" width="96" alt="PhantomTalk" />
+</p>
 
-> **Голосовой мессенджер с собственными серверами. Качество звука выше Discord.**
+<h1 align="center">PhantomTalk</h1>
+
+<p align="center"><b>Голосовой мессенджер с собственными серверами. Качество звука выше Discord.</b></p>
 
 <p align="center">
   <a href="#быстрый-старт">Быстрый старт</a> ·
-  <a href="#скачать">Скачать .exe</a> ·
+  <a href="https://github.com/NikMusy/PhantomTalk/releases">Скачать .exe</a> ·
   <a href="#протокол">Протокол</a> ·
   <a href="#хостинг-через-cloudflare-tunnel">Cloudflare Tunnel</a>
+</p>
+
+<p align="center">
+  <img src="docs/media/intro.gif" width="780" alt="Кинематографичное интро сайта" />
 </p>
 
 ---
 
 PhantomTalk — TeamSpeak-style голосовой чат с собственными серверами,
-каналами и push-to-talk. Использует Opus 48 kHz **stereo до 510 кбит/с**
-(стандартный голос Discord — 64 кбит/с моно, Nitro — 384 кбит/с).
+каналами, личными сообщениями, звонками 1-на-1 и демонстрацией экрана.
+Использует Opus 48 kHz **stereo до 510 кбит/с** (стандартный голос
+Discord — 64 кбит/с моно, Nitro — 384 кбит/с).
 
-- **Клиент:** PyQt6, low-latency UDP, Opus FEC, jitter buffer
-- **Сервер:** FastAPI + WebSocket + UDP voice relay, SQLite
-- **Сайт:** анимированный лендинг с server browser
-- **EXE:** один файл ~48 MB через PyInstaller
+| Приложение (PyQt6, ember-тема) | Живой чат прямо на сайте |
+|---|---|
+| ![app](docs/media/app.png) | ![chat](docs/media/chat.png) |
+
+| «Работает в РФ» — сцена интро | Экосистема Phantom |
+|---|---|
+| ![ru](docs/media/scene5.png) | ![eco](docs/media/eco.png) |
+
+- **Клиент:** одно красивое окно — кинематографичное приветствие, Discord-раскладка,
+  ЛС + звонки + демонстрация экрана, шрифты Playfair Display / Inter
+- **Сервер:** FastAPI + WebSocket + UDP voice relay + веб-чат, SQLite
+- **Сайт:** анимированный лендинг (60-сек интро, искры, живой чат, server browser)
+- **Установщик:** кинематографичный PhantomTalkSetup.exe с анимациями
+- **EXE:** один файл ~55 MB через PyInstaller
 
 ## Быстрый старт
 

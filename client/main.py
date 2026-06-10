@@ -49,6 +49,18 @@ def main():
     if ic:
         win.setWindowIcon(QIcon(ic))
     win.show()
+
+    # debug/docs: PT_SHOT=<path> → self-screenshot after 9s, then quit
+    shot = os.environ.get("PT_SHOT")
+    if shot:
+        from PyQt6.QtCore import QTimer
+        def _snap():
+            try:
+                win.windowHandle().screen().grabWindow(win.winId()).save(shot, "PNG")
+            finally:
+                app.quit()
+        QTimer.singleShot(9000, _snap)
+
     return app.exec()
 
 

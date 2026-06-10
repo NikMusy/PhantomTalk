@@ -161,6 +161,56 @@ async def health():
     return {"ok": True, "udp_port": UDP_PORT, "sessions": len(SESSIONS)}
 
 
+# ----------------------------- website live chat ------------------------------
+# Lightweight global lobby for the landing page. In-memory only.
+WEBCHAT_CLIENTS: Set[WebSocket] = set()
+WEBCHAT_HISTORY: list = []
+
+
+async def _webchat_broadcast(msg: dict):
+    data = json.dumps(msg, ensure_ascii=False)
+    dead = []
+    for c in WEBCHAT_CLIENTS:
+        try:
+            await c.send_text(data)
+        except Exception:
+            dead.append(c)
+    for d in dead:
+        WEBCHAT_CLIENTS.discard(d)
+
+
+@app.websocket("/ws/webchat")
+async def webchat(ws: WebSocket):
+    await ws.accept()
+    WEBCHAT_CLIENTS.add(ws)
+    try:
+        await ws.send_text(json.dumps(
+            {"type": "history", "messages": WEBCHAT_HISTORY[-50:],
+             "online": len(WEBCHAT_CLIENTS)}, ensure_ascii=False))
+        await _webchat_broadcast({"type": "online", "online": len(WEBCHAT_CLIENTS)})
+        while True:
+            raw = await ws.receive_text()
+            try:
+                m = json.loads(raw)
+            except Exception:
+                continue
+            if m.get("type") == "chat":
+                text = str(m.get("text", "")).strip()[:500]
+                if not text:
+                    continue
+                msg = {"type": "chat",
+                       "nick": (str(m.get("nick", "")).strip()[:24] or "гость"),
+                       "text": text, "ts": int(time.time())}
+                WEBCHAT_HISTORY.append(msg)
+                del WEBCHAT_HISTORY[:-200]
+                await _webchat_broadcast(msg)
+    except WebSocketDisconnect:
+        pass
+    finally:
+        WEBCHAT_CLIENTS.discard(ws)
+        await _webchat_broadcast({"type": "online", "online": len(WEBCHAT_CLIENTS)})
+
+
 @app.get("/api/servers")
 async def list_servers():
     conn = await db()
